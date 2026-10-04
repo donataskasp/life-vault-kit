@@ -1,0 +1,114 @@
+#!/bin/sh
+# Life vault pre-commit hook (portable POSIX sh). Part of the life-vault kit.
+#
+# Blocks the commit when the staged changes:
+#   1. look like a credential (API keys, bot tokens, private keys, password assignments);
+#   2. contain a Lithuanian personal code (asmens kodas) or a Lithuanian IBAN in a text
+#      file (it cannot read what a PDF or image shows: the filing recipe must catch those);
+#   3. add a PDF whose bytes carry a Lithuanian e-signature certificate with a personal
+#      code (best effort: a hit is certain, a miss does NOT prove the PDF is clean);
+#   4. modify, rename or delete anything already committed under raw/ (write-once);
+#   5. add the kit itself to the vault: files under a life-vault-kit* folder, or any
+#      nested git repository (a cloned kit folder inside the vault is staged as one
+#      "gitlink" entry, not as files, so it is caught by its mode, not its name).
+#
+# It prints file names and the check that fired, never the matching text, so a secret
+# does not end up in a terminal log or an agent transcript.
+#
+# Setup, once, from the vault root:
+#   git config core.hooksPath .githooks
+#   chmod +x .githooks/pre-commit .githooks/post-commit
+#
+# Turn off checks 2 and 3 (for example when the repo never leaves this machine):
+#   git config vault.piiScan false
+#
+# Bypassing with `git commit --no-verify` is the OWNER's decision, never an agent's.
+
+q="'"
+# Case-sensitive key shapes: Anthropic, OpenAI, GitHub, AWS, Google API, Slack,
+# Telegram bot token, PEM private keys.
+key_re="sk-ant-[A-Za-z0-9_-]{10,}|sk-(proj-)?[A-Za-z0-9_-]{32,}|gh[pousr]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35}|xox[abpr]-[A-Za-z0-9-]{10,}|[0-9]{8,10}:[A-Za-z0-9_-]{35}|-----BEGIN [A-Z ]*PRIVATE KEY"
+# Case-insensitive "name = long value" assignments.
+assign_re="(client_secret|refresh_token|access_token|private_key|api_key|apikey|password|passwd)[\"$q]?[[:space:]]*[:=][[:space:]]*[\"$q]?[^[:space:]\"$q]{12,}"
+# Lithuanian personal code: G YYMMDD NNN C, 11 digits, first digit 3-6.
+code_re="(^|[^0-9])[3-6][0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[0-9]{4}([^0-9]|$)"
+# Lithuanian IBAN: LT + 2 check digits + 16 digits, optionally grouped by 4.
+iban_re="LT[0-9]{2}([[:space:]]?[0-9]{4}){4}"
+
+pii_scan=yes
+[ "$(git config --get vault.piiScan)" = "false" ] && pii_scan=no
+
+blocked=0
+report() {
+  echo "BLOCKED ($1): $2" >&2
+  blocked=1
+}
+
+# Added lines of one staged file (text files only; binary files produce no lines).
+added_lines() {
+  git diff --cached -U0 --no-color --no-ext-diff --no-textconv -- "$1" \
+    | grep -E '^\+' | grep -vE '^\+\+\+ '
+}
+
+files=$(git -c core.quotePath=false diff --cached --name-only --diff-filter=ACMRT)
+
+# Nested git repositories (mode 160000), such as a cloned kit folder inside the vault.
+nested=$(git -c core.quotePath=false diff --cached --raw --diff-filter=ACMRT \
+  | awk -F '\t' '{ split($1, m, " "); if (m[2] == "160000") print $NF }')
+if [ -n "$nested" ]; then
+  while IFS= read -r f; do
+    [ -n "$f" ] && report "nested git repository (the kit folder?); move it out of the vault" "$f"
+  done <<EOF
+$nested
+EOF
+fi
+
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+
+  case "$f" in
+    life-vault-kit*|*/life-vault-kit/*|*/life-vault-kit-*/*) report "kit file inside the vault; move the kit folder out" "$f"; continue ;;
+  esac
+
+  lines=$(added_lines "$f")
+  if [ -n "$lines" ]; then
+    printf '%s\n' "$lines" | grep -qE -e "$key_re" && report "credential pattern" "$f"
+    printf '%s\n' "$lines" | grep -qiE -e "$assign_re" && report "secret assignment" "$f"
+    if [ "$pii_scan" = yes ]; then
+      printf '%s\n' "$lines" | grep -qE -e "$code_re" && report "possible Lithuanian personal code" "$f"
+      printf '%s\n' "$lines" | grep -qE -e "$iban_re" && report "Lithuanian IBAN" "$f"
+    fi
+  fi
+
+  if [ "$pii_scan" = yes ]; then
+    lower=$(printf '%s' "$f" | tr 'A-Z' 'a-z')
+    case "$lower" in
+      *.pdf)
+        # PNOLT-<code> is the certificate serial of a Lithuanian e-signature. Inside a
+        # signature it is usually stored hex-encoded (504E4F4C54 = "PNOLT").
+        if git cat-file blob ":$f" 2>/dev/null | LC_ALL=C grep -a -i -q -e 'PNOLT' -e '504e4f4c54'; then
+          report "PDF carries an e-signature personal code; redact before filing, see the life-vault kit SECURITY.md section 4" "$f"
+        fi
+        ;;
+    esac
+  fi
+done <<EOF
+$files
+EOF
+
+# raw/ is write-once: nothing already committed there may change, move or disappear.
+raw_changed=$(git -c core.quotePath=false diff --cached --name-only --diff-filter=DMRT -- raw/)
+if [ -n "$raw_changed" ]; then
+  while IFS= read -r f; do
+    [ -n "$f" ] && report "raw/ is write-once" "$f"
+  done <<EOF
+$raw_changed
+EOF
+fi
+
+if [ "$blocked" -ne 0 ]; then
+  echo "Commit blocked by the vault pre-commit hook. Unstage or fix the files above." >&2
+  echo "A false positive is the owner's call: only the owner decides to use --no-verify." >&2
+  exit 1
+fi
+exit 0

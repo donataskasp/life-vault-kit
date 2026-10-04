@@ -1,0 +1,31 @@
+#!/bin/sh
+# Life vault post-commit hook (portable POSIX sh). Part of the life-vault kit.
+#
+# Pushes every commit to the ONE private backup remote, so the off-machine copy is
+# never more than one commit behind. Non-blocking: a failed push never undoes the
+# commit; it prints a note and the next successful push catches up.
+#
+# Remote name: `git config vault.backupRemote <name>` (default: origin).
+# No such remote configured: the hook does nothing (local-only vaults are fine).
+# It never force-pushes and never pushes to any other remote.
+#
+# Setup, once, from the vault root:
+#   git config core.hooksPath .githooks
+#   chmod +x .githooks/pre-commit .githooks/post-commit
+
+remote=$(git config --get vault.backupRemote) || remote=origin
+git remote get-url "$remote" >/dev/null 2>&1 || exit 0
+
+# Skip mid-rebase and on a detached HEAD; the next normal commit pushes.
+for d in rebase-merge rebase-apply; do
+  [ -d "$(git rev-parse --git-path "$d")" ] && exit 0
+done
+branch=$(git symbolic-ref --quiet --short HEAD) || exit 0
+
+if ! GIT_TERMINAL_PROMPT=0 git push --quiet "$remote" "HEAD:refs/heads/$branch" 2>/dev/null; then
+  echo "NOTE: backup push to '$remote' failed (network, auth, drive not plugged in, or the remote moved ahead)." >&2
+  echo "      The commit is safe locally. If the remote moved ahead (another computer pushed)," >&2
+  echo "      run 'git pull --no-rebase $remote $branch' first, then 'git push $remote $branch'." >&2
+  echo "      Never force-push the vault." >&2
+fi
+exit 0
