@@ -17,17 +17,17 @@ An attacker who gets text in front of your agent wants one of three things:
 2. **Action**: make the agent send, forward, delete, accept an invite, or change a setting.
 3. **Stored injection**: plant an instruction in your vault that fires weeks later, when a future session reads the compiled page.
 
-Real cases the design was built against (from our July 2026 research notes; not re-verified for this kit):
+Published cases the design was built against (sources below, re-checked 2026-11-10). The first two were found by researchers and addressed by the vendors:
 
 - **EchoLeak** (CVE-2025-32711): a hidden instruction in an ordinary email was pulled into Microsoft 365 Copilot's context by a later, unrelated question, and data left through automatically fetched image links. No click needed.
 - **"Invitation Is All You Need"** (SafeBreach, against Gemini): instructions hidden in calendar invite titles fired when the user asked "what's on my calendar", leaking data and controlling smart-home devices.
-- **The OpenClaw crisis** (early 2026): the largest real damage came from malicious skills in a public marketplace that harvested plaintext credentials, plus persistent memory files poisoned to fire on later runs.
+- **Malicious skills for the OpenClaw agent** (early 2026): security audits found hundreds of skills in its public marketplace that stole credentials or installed malware, and researchers warned that poisoned memory files can fire on later runs.
 
 The pattern: the worst outcomes came from an open exfiltration channel and reachable credentials, not from the model being fooled on its own.
 
 ## 2. The idea: you can't stop prompt injection, so make it worthless
 
-Filters and "be careful" instructions are not a boundary. A 2025 paper by researchers from OpenAI, Anthropic and Google DeepMind ("The Attacker Moves Second") reported that adaptive attacks bypassed nearly all of the published defenses they tested. Anthropic's own browser-use report put the attack success rate of its strongest model at about 1% and said plainly that this "still represents meaningful risk".
+Filters and "be careful" instructions are not a boundary. A 2025 paper by researchers from OpenAI, Anthropic, Google DeepMind and others ("The Attacker Moves Second") reported that adaptive attacks bypassed the 12 published defenses they tested, with success rates above 90% for most. Anthropic's own browser-use report put the attack success rate of its strongest model at about 1% and said plainly that this "still represents meaningful risk".
 
 So design for the case where an injection succeeds and make sure it can do little:
 
@@ -78,7 +78,10 @@ The kit's pre-commit hook blocks a staged PDF whose raw bytes contain `PNOLT` or
 ## Sources
 
 - Simon Willison, "The lethal trifecta for AI agents" (16 June 2025): https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/ (verified 2026-09-29)
-- Meta AI, "Agents Rule of Two: A Practical Approach to AI Agent Security" (31 October 2025): https://ai.meta.com/blog/practical-ai-agent-security/ (located via search 2026-09-29; page not opened)
+- Meta AI, "Agents Rule of Two: A Practical Approach to AI Agent Security" (31 October 2025): https://ai.meta.com/blog/practical-ai-agent-security/ (verified 2026-11-10)
 - Claude Code permissions (Read deny rules and Bash, connector tool names, `WebFetch` rules): https://code.claude.com/docs/en/permissions (verified 2026-09-29)
 - Anthropic, "Mitigating the risk of prompt injections in browser use" (24 November 2025): https://www.anthropic.com/research/prompt-injection-defenses (verified 2026-09-29, including the "meaningful risk" quote)
-- EchoLeak, the SafeBreach Gemini research, the OpenClaw reporting, and "The Attacker Moves Second": from our July 2026 research notes, named here without links because we did not re-verify them for this kit.
+- EchoLeak: CVE-2025-32711, https://nvd.nist.gov/vuln/detail/CVE-2025-32711 (found by Aim Security, fixed by Microsoft in June 2025; checked 2026-11-10)
+- SafeBreach, "Invitation Is All You Need" (6 August 2025): https://www.safebreach.com/blog/invitation-is-all-you-need-hacking-gemini/ (verified 2026-11-10)
+- OpenClaw skills: The Hacker News, "Researchers Find 341 Malicious ClawHub Skills" (February 2026): https://thehackernews.com/2026/02/researchers-find-341-malicious-clawhub.html (checked 2026-11-10)
+- "The Attacker Moves Second" (10 October 2025): https://arxiv.org/abs/2510.09023 (verified 2026-11-10)

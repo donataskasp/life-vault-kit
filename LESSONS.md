@@ -1,6 +1,6 @@
 # Lessons from running it
 
-What running our own vault taught us, each lesson with its evidence and a date. Read the numbers with their limits. The vault was set up in July 2026, but it has **about five weeks of real use** (regular since late August: commits on 10 days in August and on 25 of the first 29 days of September), almost all from its own Claude workspace. **Most numbered lessons come from one day, the 2026-09-28 mail import**, which was audited by AI agents and not repeated.
+What running our own vault taught us, each lesson with its evidence and a date. Read the numbers with their limits. The vault was set up in July 2026, but **regular use started in late August** (commits on 10 days in August and on 25 of the first 29 days of September), almost all from its own Claude workspace. **Most numbered lessons come from one day, the 2026-09-28 mail import**, which was audited by AI agents and not repeated.
 
 Our vault is one person's, with a shared household area, maintained by Claude Code. On 2026-09-29 it had about 170 commits; 134 raw items (files, plus two folders counted once), about 60% of them agent-written research reports; mail entered as 8 verified extracts; 41 wiki pages including the three system pages; and 6 contradiction-ledger entries. Commit counts overstate life-admin use: about a third of commits belong to one hobby project, and about a sixth are about the AI setup itself.
 
@@ -95,7 +95,7 @@ This is the method, including the parts we would change. Preconditions: the Full
 
 **Evidence (outside research, July 2026, about 13 sources: write-ups, threads, docs).** The documented abandonment path was "everyone is writing, nobody is reading", even when the technology worked. The other killer is trust decay: "six months in, you have entries that are confidently wrong and the lint pass can't tell which". The four or so long-running successes all had a human review step; the one detailed corruption report did not. In our own vault, `last_checked` is not kept current reliably; lint is what catches it.
 
-**Do this.** Ask real questions every week, and log them (lesson 16). Keep citations, the gate, and the hedge audit.
+**Do this.** Ask real questions every week, and log the ones the notes could not answer (lesson 16). Keep citations, the gate, and the hedge audit.
 
 ## 11. Lithuanian e-signed PDFs carry a hidden personal code
 
@@ -127,11 +127,11 @@ This is the method, including the parts we would change. Preconditions: the Full
 
 **Do this.** Watch that share. The vault exists to hold facts, not to be improved.
 
-## 16. Log every question answered from the vault, from day one
+## 16. Log the questions the vault could not answer
 
-**Evidence.** We did not, so we cannot tell use from accumulation.
+**Evidence.** From 2026-09-29 we logged every answered question. Six weeks later we removed those 67 lines: they filled the log without paying off. The questions the vault could not answer are the useful ones, because a regular review (the weekly check in Light, the monthly lint in Full-core) turns them into gaps to fill.
 
-**Do this.** One line per answered question (`questions.md` in Light, a `query` line in `wiki/log.md` in Full-core).
+**Do this.** One line per question the notes could not answer (`questions.md` in Light, a `query` line in `wiki/log.md` in Full-core).
 
 ## 17. Anything that waits on the owner piles up
 

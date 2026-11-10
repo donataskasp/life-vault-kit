@@ -20,6 +20,7 @@ Read CLAUDE.md first. This is the lint operation: it finds problems and proposes
 9. **Index and log drift.** Pages missing from `wiki/index.md`; index lines pointing at nothing; operations in `git log` (look for the `Wiki-Op:` trailers) with no line in `wiki/log.md`.
 10. **Schema compliance.** Missing or malformed frontmatter; filenames breaking the naming convention (lowercase ASCII kebab-case).
 11. **Queue age.** Documents or drafts in `inbox/` older than 7 days, each with a proposed disposition (compile, task, or drop); items in `inbox/held-for-owner.md` older than 7 days, listed for the owner to confirm or reject.
+12. **Knowledge gaps.** `query` lines marked `(unknown)` in `wiki/log.md` that no page answers yet: list each as an info item, with the document or owner answer that would fill it.
 
 ## Output
 

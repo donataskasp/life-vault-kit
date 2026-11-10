@@ -10,7 +10,7 @@ either way, then delete this comment block.
 
 Placeholders:
   <OWNER>           what the vault calls its owner (a first name is fine: this is their vault)
-  <KIT_VERSION>     the kit's release tag, from `git -C <kit> describe --tags`, e.g. v1.0.0
+  <KIT_VERSION>     the kit's release tag, from `git -C <kit> describe --tags`, e.g. v1.0.1
   <OWNER_SLUG>      lowercase ASCII folder name for the owner's personal area, e.g. "anna"
   <AREAS>           the life areas chosen in the interview, e.g. home, family, school, car, money admin
   <GATED>           the gate scope from interview question 4; default: "private facts about people
@@ -114,11 +114,11 @@ Use the `ingest-source` skill. In short:
 
 ### Query
 
-Answer from the vault with provenance and date. If the vault does not know, say so and offer to capture the answer once <OWNER> provides it. Append `## [YYYY-MM-DD] query | <question> -> <pages used>` to `wiki/log.md`, so use can be told apart from accumulation. File genuinely useful synthesis back into the wiki through the same ingest rules.
+Answer from the vault with provenance and date. If the vault does not know, say so, offer to capture the answer once <OWNER> provides it, and append `## [YYYY-MM-DD] query | <question> -> <pages checked> (unknown)` to `wiki/log.md`: the lint turns these into knowledge gaps. Answered questions are not logged. File genuinely useful synthesis back into the wiki through the same ingest rules.
 
 ### Lint
 
-Use the `wiki-lint` skill: unresolved contradictions, stale load-bearing pages, orphans, missing cross-links, duplicates, citation and hedge integrity, shared-page leaks, text addressed to an assistant, inbox and held-queue age. Lint writes a dated report into `inbox/` (local, not backed up), commits one log line, and proposes fixes; it applies nothing without <OWNER>'s agreement.
+Use the `wiki-lint` skill: unresolved contradictions, stale load-bearing pages, orphans, missing cross-links, duplicates, citation and hedge integrity, shared-page leaks, text addressed to an assistant, inbox and held-queue age, knowledge gaps from unanswered questions. Lint writes a dated report into `inbox/` (local, not backed up), commits one log line, and proposes fixes; it applies nothing without <OWNER>'s agreement.
 
 ## Promotion gate
 
