@@ -17,7 +17,7 @@ I built it for my own home admin and shared it after friends asked how to set on
 
 Plan for about an hour. Claude asks permission before most actions (roughly 40 to 60 times in the first session): read what it wants to do and pick the plain "Yes", or "No" if it is not what you expected.
 
-[START.md](START.md) is what your Claude will follow. You are letting an agent act on instructions from someone else's repository, so read it first if you want to know what they say. To pin the exact release you read, paste "Clone tag v1.0.1 of https://github.com/donataskasp/life-vault-kit here, read life-vault-kit/START.md and follow it. Interview me before building anything." instead.
+[START.md](START.md) is what your Claude will follow. You are letting an agent act on instructions from someone else's repository, so read it first if you want to know what they say. To pin the exact release you read, paste "Clone tag v1.0.2 of https://github.com/donataskasp/life-vault-kit here, read life-vault-kit/START.md and follow it. Interview me before building anything." instead.
 
 ## What you need
 

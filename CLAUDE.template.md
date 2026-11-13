@@ -10,7 +10,7 @@ either way, then delete this comment block.
 
 Placeholders:
   <OWNER>           what the vault calls its owner (a first name is fine: this is their vault)
-  <KIT_VERSION>     the kit's release tag, from `git -C <kit> describe --tags`, e.g. v1.0.1
+  <KIT_VERSION>     the kit's release tag, from `git -C <kit> describe --tags`, e.g. v1.0.2
   <OWNER_SLUG>      lowercase ASCII folder name for the owner's personal area, e.g. "anna"
   <AREAS>           the life areas chosen in the interview, e.g. home, family, school, car, money admin
   <GATED>           the gate scope from interview question 4; default: "private facts about people

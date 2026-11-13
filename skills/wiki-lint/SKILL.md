@@ -1,6 +1,6 @@
 ---
 name: wiki-lint
-description: Consistency and health pass over the vault's wiki per CLAUDE.md. Use when the owner says "lint the wiki", "wiki health check", "any contradictions?", after any bulk import (for example an email backfill), or at a scheduled weekly or monthly review. Changes no wiki page: it writes one dated report into the local inbox/, commits one log line, and proposes fixes that are never silently applied.
+description: Consistency and health pass over the vault's wiki per CLAUDE.md. Use when the owner says "lint the wiki", "wiki health check", "any contradictions?", after any bulk import (for example an email backfill), or at a scheduled weekly or monthly review. Changes no wiki page. It writes one dated report into the local inbox/, commits one log line, and proposes fixes that are never silently applied.
 ---
 
 # Wiki lint
